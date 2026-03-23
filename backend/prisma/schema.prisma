@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   // RESTAURANT, CLIENT, ORGANIZATION
+  foods     Food[]
+  requests  FoodRequest[]
+  createdAt DateTime @default(now())
+}
+
+model Food {
+  id             Int      @id @default(autoincrement())
+  name           String
+  description    String
+  price          Float
+  type           String   // SALE, DONATION
+  expirationDate DateTime
+  restaurantId   Int
+  restaurant     User     @relation(fields: [restaurantId], references: [id])
+  requests       FoodRequest[]
+  createdAt      DateTime @default(now())
+}
+
+model FoodRequest {
+  id        Int      @id @default(autoincrement())
+  foodId    Int
+  food      Food     @relation(fields: [foodId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  status    String   // PENDING, APPROVED, REJECTED
+  createdAt DateTime @default(now())
+}
